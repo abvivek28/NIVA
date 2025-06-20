@@ -1,0 +1,167 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+/* styles.css */
+body {
+    background: linear-gradient(180deg, #0a0f1a 0%, #1a1e28 100%);
+    color: #f0f4f8;
+    font-family: 'Inter', system-ui, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 2rem;
+    min-height: 100vh;
+    text-align: center;
+}
+
+header {
+    background: rgba(26, 32, 44, 0.95);
+    padding: 3rem 1rem 2rem;
+    margin: -2rem -2rem 3rem;
+    border-bottom: 1px solid #2e3b52;
+    backdrop-filter: blur(8px);
+    position: relative;
+}
+
+header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(74, 144, 226, 0.4) 50%, 
+        transparent 100%);
+}
+
+header h1 {
+    color: #2A9DF4;
+    margin-top: 0;
+    text-shadow: 0 0 15px rgba(42, 157, 244, 0.5),
+                 0 0 30px rgba(42, 157, 244, 0.3);
+}
+
+
+.tagline {
+    color: #94a3b8;
+    font-size: 1.3rem;
+    margin: 0 auto 1.5rem;
+    max-width: 600px;
+    font-weight: 300;
+    line-height: 1.5;
+}
+
+.mission {
+    color: #cbd5e1;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin: 2rem auto;
+    max-width: 800px;
+    padding: 1.5rem;
+    background: rgba(39, 47, 65, 0.6);
+    border-radius: 16px;
+    border: 1px solid #2e3b52;
+    position: relative;
+}
+
+#record {
+    background: linear-gradient(135deg, #2e3b52 0%, #4a90e2 100%);
+    color: white;
+    border: none;
+    padding: 1.5rem 3rem;
+    font-size: 1.2rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 2rem auto;
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.2);
+    border: 1px solid #3a4a6d;
+}
+
+h1 {
+    color: #4a90e2;
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+#record:hover {
+    background: #357abd;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.3);
+}
+
+b {
+    color: #4a90e2;
+    font-weight: 600;
+}
+
+#text, #response {
+    color: #cccccc;
+    display: block;
+    margin-top: 0.5rem;
+    line-height: 1.8;
+}
+
+audio {
+    background: rgba(39, 47, 65, 0.4);
+    border-radius: 50px;
+    border: 1px solid #2e3b52;
+    padding: 0.5rem;
+    margin: 2rem auto;
+    width: 80%;
+    max-width: 400px;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    #record {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+    }
+    
+    p {
+        margin: 1rem;
+        padding: 1rem;
+    }
+}
+
+#status {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #94a3b8;
+    margin: 1.5rem auto; /* Changed from 1.5rem 0 */
+    width: 100%;
+    max-width: 800px; /* Match other content containers */
+    display: block;
+    padding: 0 1rem; /* Add horizontal padding */
+    max-height: 100px;
+}
+
+/* Update the general p rule to avoid conflicts */
+p {
+    max-width: 800px;
+    margin: 1.5rem auto;
+    padding: 1.5rem;
+    background: rgba(39, 47, 65, 0.4);
+    border-radius: 12px;
+    border: 1px solid #2e3b52;
+    text-align: left; /* Explicitly set for content paragraphs */
+}
+
+/* Add this to maintain header text alignment */
+header p {
+    text-align: center !important;
+}

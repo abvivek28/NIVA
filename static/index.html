@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NIVA</title>
+  <link rel="stylesheet" href="/static/styles_v2.css" />
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .scroll-btn {
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    .scroll-btn:hover {
+      background-color: #1f6aa5;
+    }
+
+    header .extended-mission {
+      margin-top: 30px;
+      font-size: 16px;
+      line-height: 1.6;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>NIVA</h1>
+    <p class="tagline">Natural Interactive Voice Assistant</p>
+    <p class="mission">Designed for safety, comfort, and multilingual communication.<br> 
+      Inspired by real-life heroes to provide empathetic support<br>
+      and information access for rural Indian communities. <br>
+      NIVA is trained to understand your voice in different languages, provide localized responses, 
+      and always speak with empathy and clarity.<br> Just press the button and start talking — 
+      no typing, no fuss.</p>
+
+    <!-- <p class="extended-mission">
+      Whether you're looking for help, answers, or reassurance, NIVA is here to support you. 
+      NIVA is trained to understand your voice in different languages, provide localized responses, 
+      and always speak with empathy and clarity. Just press the button and start talking — 
+      no typing, no fuss.
+    </p> -->
+
+    <button class="scroll-btn" onclick="document.getElementById('interaction').scrollIntoView({ behavior: 'smooth' })">
+      Talk to NIVA ↓
+    </button>
+  </header>
+
+  <main id="interaction">
+    <button id="record">Ask NIVA</button>
+    <p id="status">Click to talk with NIVA</p>
+    <p><b>Recognized Text:</b> <span id="text"></span></p>
+    <p><b>AI Response:</b> <span id="response"></span></p>
+    <audio id="audio" controls></audio>
+  </main>
+
+  <script>
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+
+    async function toggleRecording() {
+      const recordButton = document.getElementById("record");
+      const status = document.getElementById("status");
+
+      if (!isRecording) {
+        try {
+          isRecording = true;
+          audioChunks = [];
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+          mediaRecorder = new MediaRecorder(stream, {
+            mimeType: 'audio/webm;codecs=opus'
+          });
+
+          mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+              audioChunks.push(event.data);
+            }
+          };
+
+          mediaRecorder.onstop = async () => {
+            try {
+              const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+              const formData = new FormData();
+              formData.append('file', audioBlob, 'audio.webm');
+
+              status.textContent = "Processing speech...";
+              const recordResponse = await fetch('http://localhost:3000/speech_to_text/', {
+                method: 'POST',
+                body: formData
+              });
+
+              const speechData = await recordResponse.json();
+              if (!recordResponse.ok || speechData.error) throw new Error(speechData.error);
+
+              document.getElementById("text").textContent = speechData.text;
+              status.textContent = "Generating AI response...";
+
+              const aiResponse = await fetch('http://localhost:3000/generate-response/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: speechData.text })
+              });
+
+              const aiData = await aiResponse.json();
+              if (!aiResponse.ok || aiData.error) throw new Error(aiData.error);
+
+              document.getElementById("response").textContent = aiData.response;
+              status.textContent = "Converting response to speech...";
+
+              const ttsResponse = await fetch('http://localhost:3000/text-to-speech/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: aiData.response })
+              });
+
+              if (!ttsResponse.ok) throw new Error('Error generating audio');
+
+              const audioBlobtts = await ttsResponse.blob();
+              const audioUrl = URL.createObjectURL(audioBlobtts);
+              const audioElement = document.getElementById("audio");
+              audioElement.src = audioUrl;
+              audioElement.play();
+              status.textContent = "Done!";
+            } catch (error) {
+              status.textContent = `Error: ${error.message}`;
+            } finally {
+              stream.getTracks().forEach(track => track.stop());
+              isRecording = false;
+              recordButton.textContent = "Ask NIVA";
+            }
+          };
+
+          mediaRecorder.start();
+          recordButton.textContent = "Stop Recording";
+          status.textContent = "Recording... Speak now";
+        } catch (error) {
+          status.textContent = `Error: ${error.message}`;
+          isRecording = false;
+        }
+      } else {
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+          mediaRecorder.stop();
+          recordButton.textContent = "Ask NIVA";
+          status.textContent = "Stopping...";
+        }
+      }
+    }
+
+    document.getElementById("record").addEventListener('click', toggleRecording);
+  </script>
+</body>
+</html>
